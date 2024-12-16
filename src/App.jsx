@@ -1,25 +1,36 @@
-import { Routes, Route } from 'react-router-dom';
-import { Home } from './pages/Home';
-import { About } from './pages/About';
-import { Contact } from './pages/contact';
-import { Services } from './pages/Services';
-import { Products } from './pages/Products';
-import { Navbar } from './components/Navbar';
 
+import React, { useEffect, useState } from "react";
+import "./index.css"
+import MarvelData from "./data/MarvelData"
+import Form from "./data/Form"
+
+const apiKey = "0950794c1f3aec7b133bcffc5c5044ce"
 
 function App() {
+  const [characters, setCharacters] = useState(null);
+
+  const getCharacters = async(searchTerm) => {
+    try {
+      const response = await fetch(
+          `https://gateway.marvel.com:443/v1/public/characters?nameStartsWith=${searchTerm}&apikey=${apiKey}`
+          );
+      const data = await response.json();
+      setCharacters(data);
+    } catch(e) {
+      console.error(e)
+    }
+  }
+
+  useEffect(() => {
+    getCharacters("Iron Man");
+  }, []);
+
   return (
-    <>
-      <Navbar />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/services' element={<Services />} />
-        <Route path="/products/:productId" element={<Products />} />
-      </Routes>
-    </>
-  )
+    <div className="App">
+      <Form charactersearch={getCharacters} />
+      <MarvelData movie={characters} />
+    </div>
+  );
 }
 
-export default App
+export default App;
